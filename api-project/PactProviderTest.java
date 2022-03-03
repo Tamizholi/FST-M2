@@ -1,4 +1,4 @@
-package activities;
+package pactProject;
 
 
 import au.com.dius.pact.provider.junit.Provider;
@@ -17,18 +17,17 @@ public class PactProviderTest {
     @BeforeEach
     void before(PactVerificationContext context) {
         // Set target for provider to send request to
-        context.setTarget(new HttpTestTarget("localhost", 8585));
+       HttpTestTarget testTarget= new HttpTestTarget("localhost", 8585);
+        context.setTarget(testTarget);
     }
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactTestTemplate(PactVerificationContext context) {
-        // Verify the interaction between Consumer and Provider
-        // using the contract generated in target/pacts
         context.verifyInteraction();
     }
     // State to send the call to consumer
     @State("A request to create a user")
-    public void sampleState() {}
+    public void stateProvider() {}
 }
 
 

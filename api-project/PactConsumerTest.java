@@ -1,4 +1,4 @@
-package activities;
+package pactProject;
 
 import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
@@ -31,47 +31,39 @@ public class PactConsumerTest {
         headers.put("Content-Type", "application/json");
         headers.put("Accept", "application/json");
 // Create request JSON
-        DslPart bodySentCreateUser = new PactDslJsonBody()
-                .numberType("id", 101)
-                .stringType("firstName", "string")
-                .stringType("lastName", "string")
-                .stringType("email", "string");
-// Create response JSON
-        DslPart bodyReceivedCreateUser = new PactDslJsonBody()
-                .numberType("id", 101)
-                .stringType("firstName", "string")
-                .stringType("lastName", "string")
-                .stringType("email", "string");
-// Create rules for request and response
+        DslPart requestResponseBody = new PactDslJsonBody()
+                .numberType("id")
+                .stringType("firstName")
+                .stringType("lastName")
+                .stringType("email");
+// Create pact
         return builder.given("A request to create a user")
                 .uponReceiving("A request to create a user")
                 .path(createUser)
                 .method("POST")
                 .headers(headers)
-                .body(bodySentCreateUser)
+                .body(requestResponseBody)
                 .willRespondWith()
                 .status(201)
-                .body(bodyReceivedCreateUser)
+                .body(requestResponseBody)
                 .toPact();
     }
 
     @Test
     @PactTestFor(providerName = "UserProvider", port = "8282")
-    public void runTest() {
-        // Mock url
+    public void consumerTest() {
+        // API url
         RestAssured.baseURI = "http://localhost:8282";
-// Create request specification
-        RequestSpecification rq = RestAssured.given().headers(headers).when();
 
-// Create request body
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("id", 101);
-        map.put("firstName", "Tam");
-        map.put("lastName", "CT");
-        map.put("email", "TamCT@mail.com");
-        // Send POST request
-        Response response = rq.body(map).post(createUser);
-// Assertion
-        assert (response.getStatusCode() == 201);
+        //Request Body
+        Map<String, Object> requestBody= new HashMap<String, Object>();
+        requestBody.put("id", 101);
+        requestBody.put("firstName", "Tam");
+        requestBody.put("lastName", "CT");
+        requestBody.put("email", "TamCT@mail.com");
+        //Response Builder
+        Response response=RestAssured.given().headers(headers).when().body(requestBody).post(createUser);
+        //Assertion
+        response.then().statusCode(201);
     }
 }
